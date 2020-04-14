@@ -1,0 +1,55 @@
+#!/bin/sh
+
+##############################################################################################################################################
+#    Version      Date              created By                                          Description                                                                                      #
+#    --------     ----------        -------------                                       -------------------                                                                              #
+#    v1.0         2019-01-22        Suresh Yadagotti Jayaram                            Generate Recursive Block Report                                                                                                                                   #                                                                                                                                                                                                                                                                                                                                  
+##############################################################################################################################################
+
+TZ=US/Eastern
+
+##############################################################################################################################################                                                                                                                                                                                                                                                  
+# Variable Declaration                                                                                                                                  #                                                                                                                          
+##############################################################################################################################################
+
+    export ENV_HOST_NAME=`hostname -f`
+    export currDt=`date +"%Y%m%d"`
+    export currTs=`date +"%Y%m%d%H%M%S"`
+
+    export DIR_HOME=`pwd`
+    echo $DIR_HOME
+    DIR_LOC=$1
+
+
+    echo "`date '+%Y-%m-%d %H:%M:%S'`"
+    echo "Started: FSCK - Block Report script..."
+    echo "Provided: Directory Location is ${DIR_LOC}"
+
+
+    if [[ ! -e ${DIR_HOME}/FSCK ]]; then
+               mkdir -p ${DIR_HOME}/FSCK
+    fi
+
+    `hadoop fs -ls -R ${DIR_LOC} | grep drwx |awk '{print $8}' > ${DIR_HOME}/FSCK/directory_list_${currDt}.txt`
+
+        while read DIR_LOCATION
+        do
+
+            echo  $DIR_LOCATION >>${DIR_HOME}/FSCK/block_report_${currDt}.txt
+            echo "==================================================================" >>${DIR_HOME}/FSCK/block_report_${currDt}.txt
+            `hdfs fsck ${DIR_LOCATION} >> ${DIR_HOME}/FSCK/block_report_${currDt}.txt`
+            echo "==================================================================" >>${DIR_HOME}/FSCK/block_report_${currDt}.txt
+            echo "==================================================================" >>${DIR_HOME}/FSCK/block_report_${currDt}.txt
+
+            return_code=$?
+            echo $return_code
+
+
+        done < ${DIR_HOME}/FSCK/directory_list_${currDt}.txt
+
+    echo "Completed: FSCK - Block Report script..." 
+
+############################################################################################################################################                                                                                                                           
+# END                                                                                                                                      #                                                                                                                          
+############################################################################################################################################
+

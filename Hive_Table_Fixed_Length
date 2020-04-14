@@ -1,0 +1,40 @@
+
+
+***************************************************************************************************************************************
+HIVE TABLE CREATION FOR FIXED LENGTH FILES
+***************************************************************************************************************************************
+
+Loading a fixed length file into a hive table is a little different from loading a normal delimited file.You can use RegexSerDe property 
+for this purpose
+
+Fixed length format files does not contain any field delimiters, and there may or may not be an end-of-record delimiter associated with 
+file.
+
+***************************************************************************************************************************************
+
+
+CREATE EXTERNAL TABLE hive_fixed_length 
+(
+	  firstname 	STRING
+	, lastname  	STRING
+	, address   	STRING
+	, country   	STRING
+	, city      	STRING
+	, state     	STRING
+	, post      	STRING
+	, phone1    	STRING
+	, phone2    	STRING
+	, email     	STRING
+	, web       	STRING
+) 
+ROW FORMAT SERDE 'org.apache.hadoop.hive.contrib.serde2.RegexSerDe' 
+WITH SERDEPROPERTIES (
+"input.regex" = "(.{10})(.{10})(.{50})(.{10})(.{7})(.{15})(.{25})(.{10})(.{10})(.{20})(.{30})" 
+--Length of each column specified between braces "({})"
+"output.format.string" = "%1$s %2$s %3$s %4$s %5$s %6$s %7$s %8$s %9$s %10$s %11$s"    
+ --Output in string format
+)
+LOCATION '/path/to/input/hive_fixed_length/'
+;
+
+

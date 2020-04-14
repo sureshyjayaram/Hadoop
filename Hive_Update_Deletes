@@ -1,0 +1,75 @@
+***************************************************************************************************************************************
+USING HIVE ACID TRANSACTIONS TO INSERT, UPDATE AND DELETE DATA
+***************************************************************************************************************************************
+
+Hive supports single-table transactions. 
+  -Tables must be marked as transactional in order to support UPDATE and DELETE operations.
+  
+
+Follow Below steps to create table to handle Updates and Deletes....
+
+***************************************************************************************************************************************
+1. Create table in ORC format
+***************************************************************************************************************************************
+
+CREATE TABLE STUDENT
+(
+    std_id      INT
+  , std_name    STRING
+  , age         INT
+  , address     STRING
+)
+CLUSTERED BY (address) INTO 3 BUCKETS
+ROW FORMAT DELIMITED
+FIELDS TERMINATED BY ','
+STORED AS ORC 
+tblproperties('transactional'='true')
+;
+
+
+***************************************************************************************************************************************
+2. Insert Sample data into student table
+***************************************************************************************************************************************
+
+INSERT INTO TABLE student VALUES   (101,'JAVACHAIN',30,'PAUL REVERE RD')
+                                 , (102,'ANTO',18,'29 NATHAN HALE')
+                                 , (103,'PRABU',23,'34 henry road')
+                                 , (104,'KUMAR',24,'gandhi road')
+                                 , (105,'jack',35,'Modi street')
+ ;
+
+
+***************************************************************************************************************************************
+3.  Set Below properties either at Command line or Hive-site.xml
+***************************************************************************************************************************************
+
+SET hive.support.concurrency = true
+;
+SET hive.enforce.bucketing = true
+;
+SET hive.exec.dynamic.partition.mode = nonstrict
+;
+SET hive.txn.manager = org.apache.hadoop.hive.ql.lockmgr.DbTxnManager
+;
+SET hive.compactor.initiator.on = true
+;
+SET hive.compactor.worker.threads = 2
+;
+
+
+***************************************************************************************************************************************
+4.  Update Query
+***************************************************************************************************************************************
+
+UPDATE student SET name= 'Apache Hive' where std_id = 104
+;
+
+
+***************************************************************************************************************************************
+5. Delete Query
+***************************************************************************************************************************************
+
+DELETE from Student where std_id = 101
+;
+
+

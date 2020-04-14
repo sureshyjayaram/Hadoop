@@ -1,0 +1,19 @@
+****************************************************************************************************************************************
+Hive Table Creation with Multi Delimiter - Use MultiDelimitSerde
+****************************************************************************************************************************************
+
+ADD JAR hive-contrib.jar
+;
+
+CREATE EXTERNAL TABLE table_name
+(
+    fname       STRING
+  , lname       STRING
+  , id          INT
+  , location    STRING
+)
+ROW FORMAT SERDE 'org.apache.hadoop.hive.contrib.serde2.MultiDelimitSerDe'
+WITH SERDEPROPERTIES ("field.delim"="~*")
+STORED AS TEXTFILE
+LOCATION '/user/table_name'
+;
